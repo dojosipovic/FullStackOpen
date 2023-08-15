@@ -1,9 +1,14 @@
 import numberService from "../services/numbers"
 
-const PersonForm = ({ persons, personsSetter, newName, newNameSetter, newNumber, newNumberSetter, displayPersonsSetter }) => {
+const PersonForm = ({ persons, personsSetter, newName, newNameSetter, newNumber, newNumberSetter, displayPersonsSetter, displayMessage }) => {
   const handleChangeInput = (event) => newNameSetter(event.target.value)
 
   const handleChangeNumber = (event) => newNumberSetter(event.target.value)
+
+  const showMessage = (message) => {
+    displayMessage(message)
+    setTimeout(() => { displayMessage(null) }, 5000)
+  }
 
   const handleAdd = (event) => {
     event.preventDefault()
@@ -26,6 +31,7 @@ const PersonForm = ({ persons, personsSetter, newName, newNameSetter, newNumber,
             displayPersonsSetter(newPersons)
             newNameSetter("")
             newNumberSetter("")
+            showMessage(`Added ${returnedPerson.name}`)
           })
 
       }
@@ -43,6 +49,7 @@ const PersonForm = ({ persons, personsSetter, newName, newNameSetter, newNumber,
           displayPersonsSetter(newPersons)
           newNameSetter("")
           newNumberSetter("")
+          showMessage(`Added ${returnedPerson.name}`)
         })
     }
   }
