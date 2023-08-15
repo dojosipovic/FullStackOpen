@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import numberService from './services/numbers'
 import Persons from "./components/Persons"
 import PersonForm from "./components/PersonForm"
 import Filter from "./components/Filter"
@@ -10,14 +10,36 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [displayPersons, setDisplayPersons] = useState([])
   
+  const setDisplayNumbers = (personsSetter, displayPersonsSetter) => {
+    numberService
+      .getAll()
+      .then(numbers => {
+        personsSetter(numbers)
+        displayPersonsSetter(numbers)
+      })
+  }
+  
   useEffect(() => {
-    axios
-    .get("http://localhost:3001/persons")
-    .then(response => {
-      setPersons(response.data)
-      setDisplayPersons(response.data)
-    })
+    setDisplayNumbers(setPersons, setDisplayPersons)
   }, [])
+
+  const deletePersonAtID = id => {
+    console.log(`deleting user of id ${id}`)
+    
+    numberService.delete(id)
+      .then(() => {setDisplayNumbers(setPersons, setDisplayPersons)})
+      .catch(error => {
+        alert(`The number with id ${id} was already deleted`)
+        const newPersons = persons.filter(p => p.id !== id)
+        setPersons(newPersons)
+        setDisplayPersons(newPersons)
+      })
+  }
+
+  const removePerson = (person) => {
+    const remove = window.confirm(`Delete ${person.name}?`)
+    if (remove) deletePersonAtID(person.id)
+  }
 
 
   return (
@@ -35,7 +57,10 @@ const App = () => {
         displayPersonsSetter={setDisplayPersons}
       />
       <h2>Numbers</h2>
-      <Persons persons={displayPersons} />
+      <Persons
+        persons={displayPersons}
+        deletePerson={removePerson}
+      />
     </div>
   )
 }
