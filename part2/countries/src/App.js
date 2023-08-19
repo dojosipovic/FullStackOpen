@@ -38,6 +38,11 @@ const App = () => {
     }
   }
 
+  const buttonShowClick = (name) => {
+    console.log(`clicked ${name}`)
+    setTargets(countries.filter(c => c.name.common === name))
+  }
+
   if (targets === null) return <div>find countries <input value={value} onChange={handleChange} /></div>
   if (targets.length === 1 && country !== null) {
     return(
@@ -62,7 +67,15 @@ const App = () => {
     return(
       <div>
         find countries <input value={value} onChange={handleChange} />
-        <div>{targets.map(c => <div key={c.name.common}>{c.name.common}</div>)}</div>
+        <div>
+          {
+            targets.map(c =>
+              <div key={c.name.common}>
+                {c.name.common}
+                <button onClick={() => buttonShowClick(c.name.common)}>show</button>
+              </div>)
+          }
+        </div>
       </div>
     )
   }
