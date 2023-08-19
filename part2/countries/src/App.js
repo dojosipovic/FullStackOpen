@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 
 const App = () => {
+  const api_key = process.env.REACT_APP_API_KEY
   const [countries, setCountries] = useState(null)
   const [value, setValue] = useState('')
   const [targets, setTargets] = useState(null)
   const [country, setCountry] = useState(null)
+  const [weather, setWeather] = useState(null)
 
   useEffect(() => {
     if (!countries) {
@@ -20,8 +22,19 @@ const App = () => {
 
   useEffect(() => {
     if (targets === null) return
-    if (targets.length === 1) setCountry(targets[0])
+    if (targets.length === 1){
+      setCountry(targets[0])
+      getWeatherData(targets[0].capital[0])
+    } 
   }, [targets])
+
+  const getWeatherData = (city) => {
+    axios
+      .get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${api_key}&units=metric `)
+      .then(response => {
+        setWeather(response.data);
+      })
+  }
 
   const handleChange = (event) => {
     setValue(event.target.value)
@@ -44,7 +57,7 @@ const App = () => {
   }
 
   if (targets === null) return <div>find countries <input value={value} onChange={handleChange} /></div>
-  if (targets.length === 1 && country !== null) {
+  if (targets.length === 1 && country !== null && weather !== null) {
     return(
       <div>
         find countries <input value={value} onChange={handleChange} />
@@ -60,6 +73,10 @@ const App = () => {
           }
         </ul>
         <img src={country.flags.png} alt={country.flags.alt}/>
+        <h3>Weather in {country.capital[0]}</h3>
+        <div>temperature {weather.main.temp} Celcius</div>
+        <img src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`} alt={`${weather.weather[0].description}`}/>
+        <div>wind {weather.wind.speed} m/s</div>
       </div>
     )
   }
